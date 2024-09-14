@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Translatable</string>
+    <string name="example_text">I am an example text</string>
+    <string name="choose_next_language">Select %s</string>
+    <string name="language_en">English</string>
+    <string name="language_nl">Dutch</string>
+    <string name="user">User is called %s</string>
+    <string name="unknown_user">Unknown user</string>
+    <string name="unknown_email">Unknown email</string>
+</resources>
