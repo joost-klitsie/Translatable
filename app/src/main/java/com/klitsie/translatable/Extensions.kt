@@ -6,6 +6,31 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 
+fun Translatable?.translate(
+	resources: Resources,
+): String = when (this) {
+	null -> ""
+	is Translatable.Resource -> resources.getString(
+		id,
+		*params.map {
+			if (it is Translatable) {
+				it.translate(resources)
+			} else {
+				it
+			}
+		}.toTypedArray(),
+	)
+
+	is Translatable.Plural -> resources.getQuantityString(id, count, *params.toTypedArray())
+
+	is Translatable.StringValue -> value
+	is Translatable.Multiple -> translations.joinToString(
+		separator = separator,
+	) {
+		it.translate(resources)
+	}
+}
+
 /**
  * Get resources from the current composable.
  * Directly inspired by stringResource(..)
@@ -19,40 +44,4 @@ internal fun resources(): Resources {
 
 @Composable
 @ReadOnlyComposable
-fun getTranslatedString(
-	translatable: Translatable?,
-): String = getTranslatedString(translatable, resources())
-
-@Composable
-@ReadOnlyComposable
-fun Translatable?.translate() = getTranslatedString(this, resources())
-
-fun getTranslatedString(
-	translatable: Translatable?,
-	resources: Resources,
-): String = when (translatable) {
-	null -> ""
-	is Translatable.Resource -> resources.getString(
-		translatable.id,
-		*translatable.params.map {
-			if (it is Translatable) {
-				getTranslatedString(it, resources)
-			} else {
-				it
-			}
-		}.toTypedArray(),
-	)
-
-	is Translatable.Plural -> resources.getQuantityString(
-		translatable.id,
-		translatable.count,
-		*translatable.params.toTypedArray(),
-	)
-
-	is Translatable.StringValue -> translatable.value
-	is Translatable.Multiple -> translatable.translations.joinToString(
-		separator = translatable.separator,
-	) {
-		getTranslatedString(it, resources)
-	}
-}
+fun Translatable?.translate() = translate(resources())
